@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Run a fixed set of hyperparameters over all potential functions
+
 for potential_function in "POT_1"  "POT_2"  "POT_3"  "POT_4"
 do                          
 echo "Starting potential function "$potential_function

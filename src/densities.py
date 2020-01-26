@@ -1,6 +1,13 @@
 import torch
 import math
 
+"""
+Potential functions U(x) from Rezende et al. 2015
+p(z) is then proportional to exp(-U(x)).
+Since we log this value later in the optimized bound,
+no need to actually exp().
+"""
+
 
 def w_1(z):
     return torch.sin((2 * math.pi * z[:, 0]) / 4)

@@ -54,6 +54,7 @@ parser.add_argument("--N_PLOT_SAMPLES",
 
 args = parser.parse_args()
 
+# Save everything in a directory with all the hyperparam info
 exp_str = "potential_{}_n_flows_{}_batch_size_{}_LR_{}_n_iters_{}/".format(
     args.POTENTIAL,
     args.N_FLOWS,
@@ -89,6 +90,7 @@ plt.close()
 
 model = NormalizingFlow(2, args.N_FLOWS)
 
+# RMSprop is what they used in renzende et al
 opt = torch.optim.RMSprop(
     params=model.parameters(),
     lr=args.LR,
@@ -104,8 +106,10 @@ for iter_ in range(args.N_ITERS):
 
     samples = Variable(random_normal_samples(args.BATCH_SIZE))
 
-    z_k, log_sum_det = model.log_det(samples)
+    z_k, log_sum_det = model(samples)
     log_p_x = target_density(z_k)
+
+    # Reverse KL since we can evaluate target density but can't sample
     loss = (- log_sum_det - (log_p_x)).mean()
 
     opt.zero_grad()

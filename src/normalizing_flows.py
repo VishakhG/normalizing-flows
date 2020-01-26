@@ -1,6 +1,5 @@
 import torch.nn as nn
 import torch
-import torch.nn.functional as F
 
 
 class PlanarFlow(nn.Module):
@@ -41,7 +40,7 @@ class PlanarFlow(nn.Module):
 
 class NormalizingFlow(nn.Module):
     """
-    A normalizng flow composed of planar flows.
+    A normalizng flow composed of a sequence of planar flows.
     """
     def __init__(self, D, n_flows=2):
         super(NormalizingFlow, self).__init__()
@@ -49,18 +48,26 @@ class NormalizingFlow(nn.Module):
             [PlanarFlow(D) for _ in range(n_flows)])
 
     def sample(self, base_samples):
+        """
+        Transform samples from a simple base distribution
+        by passing them through a sequence of Planar flows.
+        """
         samples = base_samples
         for flow in self.flows:
             samples = flow(samples)
         return samples
 
-    def log_det(self, x):
-        logp_accum = 0
-        prev_sample = x
+    def forward(self, x):
+        """
+        Computes and returns the sum of log_det_jacobians
+        and the transformed samples T(x).
+        """
+        log_sum_det = 0
+        transformed_sample = x
 
         for i in range(len(self.flows)):
-            logp_i = (self.flows[i].log_det(prev_sample))
-            logp_accum += logp_i
-            prev_sample = self.flows[i](prev_sample)
+            log_det_i = (self.flows[i].log_det(transformed_sample))
+            log_sum_det += log_det_i
+            transformed_sample = self.flows[i](transformed_sample)
 
-        return prev_sample, logp_accum
+        return transformed_sample, log_sum_det

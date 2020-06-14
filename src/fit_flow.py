@@ -106,11 +106,11 @@ for iter_ in range(args.N_ITERS):
 
     samples = Variable(random_normal_samples(args.BATCH_SIZE))
 
-    z_k, log_sum_det = model(samples)
+    z_k, sum_log_det = model(samples)
     log_p_x = target_density(z_k)
 
     # Reverse KL since we can evaluate target density but can't sample
-    loss = (- log_sum_det - (log_p_x)).mean()
+    loss = (- sum_log_det - (log_p_x)).mean()
 
     opt.zero_grad()
     loss.backward()

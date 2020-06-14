@@ -62,12 +62,12 @@ class NormalizingFlow(nn.Module):
         Computes and returns the sum of log_det_jacobians
         and the transformed samples T(x).
         """
-        log_sum_det = 0
+        sum_log_det = 0
         transformed_sample = x
 
         for i in range(len(self.flows)):
             log_det_i = (self.flows[i].log_det(transformed_sample))
-            log_sum_det += log_det_i
+            sum_log_det += log_det_i
             transformed_sample = self.flows[i](transformed_sample)
 
-        return transformed_sample, log_sum_det
+        return transformed_sample, sum_log_det
